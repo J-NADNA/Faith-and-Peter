@@ -1,47 +1,20 @@
-# Peter & Faith Website - Final Update Checklist
+# Final deployment checklist
 
-## Website update
-
-- [ ] Extract the ZIP.
-- [ ] Replace the current GitHub repository files with this version.
-- [ ] Commit and push the changes.
-- [ ] Confirm Netlify finishes the new deployment.
-
-## Google Apps Script
-
-Only do this section if Reminder Method, Reminder Contact and Reminder Time are not already being recorded in the Google Sheet.
-
-- [ ] Open the wedding Google Sheet.
-- [ ] Go to Extensions -> Apps Script.
-- [ ] Replace the current code with `google-apps-script/Code.gs`.
-- [ ] Save.
-- [ ] Deploy -> Manage deployments.
-- [ ] Edit the existing Web App deployment.
-- [ ] Version -> New version.
-- [ ] Execute as -> Me.
-- [ ] Who has access -> Anyone.
-- [ ] Deploy.
-
-## Visual and interaction test
-
-- [ ] Entrance screen looks clean on phone and desktop.
-- [ ] “Enter with our song” starts the instrumental.
-- [ ] Floating music control can pause and resume the song.
-- [ ] No couple photos appear anywhere.
-- [ ] No old icon-heavy design elements remain.
-- [ ] Venue reads **Funyula Altar** everywhere.
-- [ ] Countdown updates every second.
-- [ ] Reception directions open Samia Resort.
-- [ ] Add to Calendar downloads the wedding event.
-- [ ] Share Invitation works or copies the page URL.
-- [ ] RSVP Yes reveals the guest-count field.
-- [ ] Reminder Yes reveals date, time, reminder method and contact details.
-- [ ] WhatsApp and SMS accept a Kenyan phone number.
-- [ ] Email accepts an email address.
-- [ ] Form progress changes as fields are completed.
-- [ ] Submission reaches the Google Sheet.
-- [ ] Thank-you screen displays the guest’s first name and pledge amount.
-- [ ] M-Pesa Till Number is 1610486.
-- [ ] Copy Till Number works.
-- [ ] Faith and Peter Call and WhatsApp links work.
-- [ ] `#PeterAndFaith2026` appears in the footer.
+- [ ] Confirm `Funyula Altar` appears correctly.
+- [ ] Confirm wedding date is 5 December 2026 and ceremony time is 9:00 AM.
+- [ ] Confirm reception is Samia Resort, Nangina, Mayatos-Funyula Rd, Busia.
+- [ ] Test the reception map button.
+- [ ] Test "Enter with our song" and the floating music control on iPhone / Android if available.
+- [ ] Test the countdown.
+- [ ] Test Peter / Faith message switching.
+- [ ] Test RSVP = Yes and confirm guest-count choices appear.
+- [ ] Test RSVP = No / Maybe and confirm guest-count choices disappear.
+- [ ] Test a pledge amount and optional message.
+- [ ] Test Reminder = Yes with WhatsApp, SMS and Email.
+- [ ] Test the press-and-hold submission interaction.
+- [ ] Confirm the test row appears in Google Sheets.
+- [ ] Confirm reminder method, contact and time appear in Google Sheets.
+- [ ] Test the M-Pesa Till copy button.
+- [ ] Test Faith and Peter call / WhatsApp buttons.
+- [ ] Test the page on a small phone and a desktop browser.
+- [ ] Confirm Netlify has redeployed the newest GitHub commit.

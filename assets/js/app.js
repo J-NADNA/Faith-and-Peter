@@ -1,366 +1,483 @@
 (() => {
   'use strict';
-
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const config = window.WEDDING_CONFIG || {};
-  const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-  const entrance = $('#entrance');
-  const audio = $('#weddingAudio');
-  const musicControl = $('#musicControl');
-  const musicLabel = $('.music-control__label');
+  const body = document.body;
+  const gate = $('#experienceGate');
+  const audio = $('#weddingSong');
+  const musicDock = $('#musicDock');
+  const musicLabel = $('#musicLabel');
+  const heroPlay = $('#heroPlay');
+  const topbar = $('#topbar');
   const form = $('#pledgeForm');
   const formError = $('#formError');
-  const submitButton = $('#submitButton');
-  const normalText = $('.submit-normal', submitButton);
-  const loadingText = $('.submit-loading', submitButton);
-  const guestCountPanel = $('#guestCountPanel');
-  const guestCount = $('#guestCount');
-  const reminderPanel = $('#reminderPanel');
-  const reminderDate = $('#reminderDate');
-  const reminderTime = $('#reminderTime');
-  const reminderContact = $('#reminderContact');
-  const reminderContactHint = $('#reminderContactHint');
+  let currentStep = 1;
+  let submitting = false;
+  let holdTimer = null;
+  let holdStart = 0;
+  let holdRaf = null;
 
-  document.body.classList.add('no-scroll');
+  body.classList.add('gate-open');
 
-  function closeEntrance(playMusic) {
-    entrance.classList.add('is-hidden');
-    document.body.classList.remove('no-scroll');
-    if (playMusic) {
-      audio.play().catch(() => {});
-    }
-  }
-
-  $('#enterWithMusic').addEventListener('click', () => closeEntrance(true));
-  $('#enterQuietly').addEventListener('click', () => closeEntrance(false));
-
-  function syncMusicButton() {
+  const setMusicUI = () => {
     const playing = !audio.paused;
-    musicControl.classList.toggle('is-playing', playing);
-    musicControl.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
-    musicControl.title = playing ? 'Pause background music' : 'Play background music';
-    musicLabel.textContent = playing ? 'Pause' : 'Play song';
-  }
+    musicDock.classList.toggle('playing', playing);
+    musicLabel.textContent = playing ? 'Pause instrumental' : 'Play instrumental';
+    musicDock.setAttribute('aria-label', playing ? 'Pause wedding instrumental' : 'Play wedding instrumental');
+    if (heroPlay) heroPlay.textContent = playing ? 'Pause our song ♪' : 'Play our song ♪';
+  };
 
-  musicControl.addEventListener('click', async () => {
+  async function playMusic() {
     try {
-      if (audio.paused) await audio.play();
-      else audio.pause();
-    } catch (error) {
-      console.warn('Audio playback could not start.', error);
+      audio.volume = 0.55;
+      await audio.play();
+      setMusicUI();
+    } catch (e) {
+      console.warn('Music playback needs another tap.', e);
     }
-    syncMusicButton();
-  });
-  audio.addEventListener('play', syncMusicButton);
-  audio.addEventListener('pause', syncMusicButton);
-
-  const weddingTime = new Date(config.weddingDate || '2026-12-05T09:00:00+03:00').getTime();
-  function updateCountdown() {
-    const diff = Math.max(0, weddingTime - Date.now());
-    const days = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff % 86400000) / 3600000);
-    const minutes = Math.floor((diff % 3600000) / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-    $('#days').textContent = String(days);
-    $('#hours').textContent = String(hours).padStart(2, '0');
-    $('#minutes').textContent = String(minutes).padStart(2, '0');
-    $('#seconds').textContent = String(seconds).padStart(2, '0');
   }
+
+  function enterExperience(withMusic) {
+    gate.classList.add('closed');
+    body.classList.remove('gate-open');
+    topbar.classList.add('visible');
+    musicDock.classList.add('visible');
+    if (withMusic) playMusic();
+    setTimeout(() => gate.setAttribute('aria-hidden', 'true'), 900);
+  }
+
+  $('#enterWithMusic')?.addEventListener('click', () => enterExperience(true));
+  $('#enterQuietly')?.addEventListener('click', () => enterExperience(false));
+  musicDock?.addEventListener('click', () => audio.paused ? playMusic() : audio.pause());
+  heroPlay?.addEventListener('click', () => audio.paused ? playMusic() : audio.pause());
+  audio?.addEventListener('play', setMusicUI);
+  audio?.addEventListener('pause', setMusicUI);
+
+  // Scroll reveals and page progress
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.14, rootMargin: '0px 0px -5% 0px' });
+  $$('.reveal').forEach(el => revealObserver.observe(el));
+
+  const pageProgress = $('#pageProgress');
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const pct = max > 0 ? Math.min(100, Math.max(0, scrollY / max * 100)) : 0;
+    pageProgress.style.width = `${pct}%`;
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Desktop glow
+  const glow = $('#cursorGlow');
+  if (matchMedia('(pointer:fine)').matches) {
+    addEventListener('pointermove', (e) => {
+      glow.style.left = `${e.clientX}px`;
+      glow.style.top = `${e.clientY}px`;
+      glow.style.opacity = '1';
+    }, { passive: true });
+    addEventListener('mouseout', () => glow.style.opacity = '0');
+  }
+
+  // Play the decorative countdown video only near viewport
+  const countdownVideo = $('#countdownVideo');
+  if (countdownVideo) {
+    const videoObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) countdownVideo.play().catch(() => {});
+      else countdownVideo.pause();
+    }, { threshold: 0.18 });
+    videoObserver.observe(countdownVideo);
+  }
+
+  // Countdown
+  const weddingDate = new Date(config.weddingDate || '2026-12-05T09:00:00+03:00');
+  const pad2 = n => String(n).padStart(2, '0');
+  const updateCountdown = () => {
+    const diff = Math.max(0, weddingDate.getTime() - Date.now());
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor(diff / 3600000) % 24;
+    const minutes = Math.floor(diff / 60000) % 60;
+    const seconds = Math.floor(diff / 1000) % 60;
+    $('#days').textContent = String(days).padStart(3, '0');
+    $('#hours').textContent = pad2(hours);
+    $('#minutes').textContent = pad2(minutes);
+    $('#seconds').textContent = pad2(seconds);
+  };
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: .12 });
-  $$('.reveal').forEach((element) => observer.observe(element));
-
-  function setAttendanceState() {
-    const attendance = $('input[name="attendance"]:checked', form)?.value;
-    const attending = attendance === 'Yes';
-    guestCountPanel.hidden = !attending;
-    guestCount.required = attending;
-    if (!attending) guestCount.value = '';
-  }
-  $$('input[name="attendance"]', form).forEach((radio) => radio.addEventListener('change', setAttendanceState));
-
-  const today = new Date();
-  const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-  const weddingDateOnly = new Date('2026-12-05T00:00:00+03:00');
-  const toInputDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-  reminderDate.min = toInputDate(minDate);
-  reminderDate.max = toInputDate(weddingDateOnly);
-
-  function setReminderState() {
-    const requested = $('input[name="reminderRequested"]:checked', form)?.value === 'Yes';
-    reminderPanel.hidden = !requested;
-    reminderDate.required = requested;
-    reminderTime.required = requested;
-    if (!requested) {
-      reminderDate.value = '';
-      reminderTime.value = '';
-      $$('input[name="reminderMethod"]', form).forEach((radio) => { radio.checked = false; radio.required = false; });
-      reminderContact.value = '';
-      reminderContact.disabled = true;
-      reminderContact.required = false;
-      reminderContact.type = 'text';
-      reminderContact.placeholder = 'Choose a reminder method above';
-    } else {
-      const methods = $$('input[name="reminderMethod"]', form);
-      if (methods.length) methods[0].required = true;
-    }
-  }
-  $$('input[name="reminderRequested"]', form).forEach((radio) => radio.addEventListener('change', setReminderState));
-
-  function syncReminderContact() {
-    const method = $('input[name="reminderMethod"]:checked', form)?.value;
-    if (!method) return;
-    reminderContact.disabled = false;
-    reminderContact.required = true;
-    if (method === 'Email') {
-      reminderContact.type = 'email';
-      reminderContact.inputMode = 'email';
-      reminderContact.placeholder = 'e.g. name@example.com';
-      reminderContact.value = reminderContact.value.includes('@') ? reminderContact.value : '';
-      reminderContactHint.textContent = 'Enter the email address where you would like the reminder sent.';
-    } else {
-      reminderContact.type = 'tel';
-      reminderContact.inputMode = 'tel';
-      reminderContact.placeholder = 'e.g. +254 712 345 678';
-      if (!reminderContact.value || reminderContact.value.includes('@')) reminderContact.value = $('#phone').value.trim();
-      reminderContactHint.textContent = method === 'WhatsApp'
-        ? 'Enter the WhatsApp number where you would like the reminder sent.'
-        : 'Enter the mobile number where you would like the SMS reminder sent.';
-    }
-  }
-  $$('input[name="reminderMethod"]', form).forEach((radio) => radio.addEventListener('change', syncReminderContact));
-
-  $('#phone').addEventListener('blur', () => {
-    const method = $('input[name="reminderMethod"]:checked', form)?.value;
-    if ((method === 'WhatsApp' || method === 'SMS') && !reminderContact.value) reminderContact.value = $('#phone').value.trim();
-  });
-
-
-  // A light, useful progress indicator keeps the form feeling conversational.
-  const progressText = $('#progressText');
-  const progressBars = $$('.form-progress__bar span');
-  function updateFormProgress() {
-    const attendance = $('input[name="attendance"]:checked', form)?.value;
-    const reminder = $('input[name="reminderRequested"]:checked', form)?.value;
-    const reminderMethod = $('input[name="reminderMethod"]:checked', form)?.value;
-    const steps = [
-      Boolean($('#fullName').value.trim() && $('#phone').value.trim()),
-      Boolean(attendance && (attendance !== 'Yes' || guestCount.value)),
-      Number($('#pledgeAmount').value) > 0,
-      Boolean(reminder && (reminder !== 'Yes' || (reminderDate.value && reminderTime.value && reminderMethod && reminderContact.value.trim())))
-    ];
-    const completed = steps.filter(Boolean).length;
-    progressText.textContent = `${completed} of 4 complete`;
-    progressBars.forEach((bar, index) => bar.classList.toggle('is-complete', steps[index]));
-  }
-  form.addEventListener('input', updateFormProgress);
-  form.addEventListener('change', updateFormProgress);
-  updateFormProgress();
-
-  // Subtle depth on desktop. No effect on touch devices.
-  const hero = $('.hero');
-  const aurora = $('.hero__aurora');
-  if (hero && aurora && window.matchMedia('(pointer:fine)').matches) {
-    hero.addEventListener('pointermove', (event) => {
-      const x = (event.clientX / window.innerWidth - .5) * 12;
-      const y = (event.clientY / window.innerHeight - .5) * 12;
-      aurora.style.translate = `${x}px ${y}px`; 
-    });
-    hero.addEventListener('pointerleave', () => { aurora.style.translate = ''; });
-  }
-
-  $$('.quick-amounts button').forEach((button) => {
-    button.addEventListener('click', () => {
-      $('#pledgeAmount').value = button.dataset.amount;
-      $$('.quick-amounts button').forEach((item) => item.classList.toggle('is-active', item === button));
-      $('#pledgeAmount').focus();
+  // Quote tabs
+  $$('.story-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const key = tab.dataset.story;
+      $$('.story-tab').forEach(t => {
+        const active = t === tab;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-selected', String(active));
+      });
+      $$('.story-panel').forEach(panel => {
+        const active = panel.dataset.panel === key;
+        panel.hidden = !active;
+        panel.classList.toggle('active', active);
+      });
     });
   });
 
-  function formatKSh(value) {
-    const amount = Number(String(value || '').replace(/,/g, '')) || 0;
-    return `KSh ${amount.toLocaleString('en-KE')}`;
-  }
+  // Wizard helpers
+  const steps = $$('.wizard-step', form);
+  const progressSegments = $$('.wizard-progress span');
+  const wizardBack = $('#wizardBack');
+  const wizardCount = $('#wizardCount');
+  const miniLine = $('#miniLine');
+  const miniText = $('#miniText');
 
-  async function shareInvitation() {
-    const shareData = {
-      title: 'Peter & Faith | 5 December 2026',
-      text: 'You are invited to celebrate Peter & Faith on 5 December 2026.',
-      url: window.location.href
-    };
-    const status = $('#shareStatus');
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        status.textContent = 'Invitation shared.';
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        status.textContent = 'Invitation link copied.';
-      }
-    } catch (error) {
-      if (error?.name !== 'AbortError') status.textContent = 'You can copy the page link from your browser.';
-    }
-    setTimeout(() => { status.textContent = ''; }, 2500);
+  function showStep(step) {
+    currentStep = Math.min(5, Math.max(1, step));
+    steps.forEach(el => {
+      const active = Number(el.dataset.step) === currentStep;
+      el.hidden = !active;
+      el.classList.toggle('active', active);
+    });
+    progressSegments.forEach((el, i) => el.classList.toggle('active', i < currentStep));
+    wizardCount.textContent = `${String(currentStep).padStart(2, '0')} / 05`;
+    wizardBack.hidden = currentStep === 1 || submitting;
+    miniLine.style.width = `${currentStep * 20}%`;
+    miniText.textContent = `Step ${currentStep} of 5`;
+    formError.hidden = true;
+    const cardTop = $('.response-card').getBoundingClientRect().top + scrollY - 100;
+    if (scrollY > cardTop + 250) scrollTo({ top: cardTop, behavior: 'smooth' });
+    const focusTarget = $('.wizard-step:not([hidden]) input:not([type=radio]):not([type=hidden]), .wizard-step:not([hidden]) button:not(.next-step)', form);
+    setTimeout(() => focusTarget?.focus({ preventScroll: true }), 260);
   }
-  $('#shareInvitation').addEventListener('click', shareInvitation);
-  $('#shareDetails').addEventListener('click', shareInvitation);
 
   function showError(message) {
     formError.textContent = message;
     formError.hidden = false;
-    formError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  function clearError() { formError.hidden = true; formError.textContent = ''; }
-  function setSubmitting(isSubmitting) {
-    submitButton.disabled = isSubmitting;
-    loadingText.hidden = !isSubmitting;
-    normalText.hidden = isSubmitting;
   }
 
-  function normalizePhone(value) { return String(value || '').replace(/[\s()-]/g, ''); }
-  function isKenyanPhone(value) { return /^(?:\+?254|0)?[17]\d{8}$/.test(normalizePhone(value)); }
+  function normalizePhone(v) { return v.replace(/[\s()-]/g, ''); }
+  function validPhone(v) {
+    const p = normalizePhone(v);
+    return /^(?:\+254|254|0)(?:1|7)\d{8}$/.test(p);
+  }
 
-  function validateForm() {
-    clearError();
-    if (!form.checkValidity()) { form.reportValidity(); return false; }
-    if (!isKenyanPhone($('#phone').value)) {
-      showError('Please enter a valid Kenyan phone number, for example 0712345678 or +254712345678.');
-      return false;
+  function validateStep(step) {
+    formError.hidden = true;
+    if (step === 1) {
+      const name = $('#fullName').value.trim();
+      const phone = $('#phone').value.trim();
+      if (name.length < 2) { showError('Please enter your name so Peter and Faith know who this is from.'); $('#fullName').focus(); return false; }
+      if (!validPhone(phone)) { showError('Please enter a valid Kenyan phone number, for example +254 712 345 678.'); $('#phone').focus(); return false; }
+      $('#attendanceGreeting').textContent = `${name.split(/\s+/)[0]}, will you be celebrating with us?`;
     }
-    const attendance = $('input[name="attendance"]:checked', form)?.value;
-    if (attendance === 'Yes' && !guestCount.value) {
-      showError('Please tell us how many people will attend, including you.');
-      return false;
+    if (step === 2) {
+      const attendance = $('input[name="attendance"]:checked', form)?.value;
+      if (!attendance) { showError('Please tell us whether you expect to attend.'); return false; }
+      if (attendance === 'Yes' && !$('input[name="guestCount"]:checked', form)) { showError('Please choose how many people will attend with you.'); return false; }
     }
-    const reminder = $('input[name="reminderRequested"]:checked', form)?.value;
-    if (reminder === 'Yes') {
-      const method = $('input[name="reminderMethod"]:checked', form)?.value;
-      if (!reminderDate.value) { showError('Please choose the date you would like to be reminded.'); return false; }
-      if (!reminderTime.value) { showError('Please choose the best time of day for your reminder.'); return false; }
-      if (!method) { showError('Please choose WhatsApp, SMS or Email for your reminder.'); return false; }
-      if (!reminderContact.value.trim()) { showError('Please enter where we should send the reminder.'); return false; }
-      if ((method === 'WhatsApp' || method === 'SMS') && !isKenyanPhone(reminderContact.value)) {
-        showError(`Please enter a valid Kenyan phone number for the ${method} reminder.`); return false;
-      }
-      if (method === 'Email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(reminderContact.value.trim())) {
-        showError('Please enter a valid email address for the reminder.'); return false;
+    if (step === 3) {
+      const amount = Number($('#pledgeAmount').value || 0);
+      if (!Number.isFinite(amount) || amount <= 0) { showError('Please enter the amount you would like to pledge.'); $('#pledgeAmount').focus(); return false; }
+    }
+    if (step === 4) {
+      const requested = $('input[name="reminderRequested"]:checked', form)?.value;
+      if (!requested) { showError('Please tell us whether you would like a pledge reminder.'); return false; }
+      if (requested === 'Yes') {
+        const date = $('#reminderDate').value;
+        const time = $('#reminderTime').value;
+        const method = $('input[name="reminderMethod"]:checked', form)?.value;
+        const contact = $('#reminderContact').value.trim();
+        if (!date) { showError('Please choose the date you would like to be reminded.'); return false; }
+        if (!time) { showError('Please choose the best time of day for your reminder.'); return false; }
+        if (!method) { showError('Please choose WhatsApp, SMS or Email for your reminder.'); return false; }
+        if (!contact) { showError('Please enter where we should send the reminder.'); return false; }
+        if ((method === 'WhatsApp' || method === 'SMS') && !validPhone(contact)) { showError(`Please enter a valid Kenyan phone number for the ${method} reminder.`); return false; }
+        if (method === 'Email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) { showError('Please enter a valid email address for the reminder.'); return false; }
       }
     }
     return true;
   }
 
-  function buildPayload() {
+  $$('.next-step', form).forEach(btn => btn.addEventListener('click', () => {
+    if (!validateStep(currentStep)) return;
+    if (currentStep === 4) buildReview();
+    showStep(currentStep + 1);
+  }));
+  wizardBack.addEventListener('click', () => showStep(currentStep - 1));
+
+  // Attendance dependent field
+  const guestPanel = $('#guestPanel');
+  $$('input[name="attendance"]', form).forEach(radio => radio.addEventListener('change', () => {
+    const yes = $('input[name="attendance"]:checked', form)?.value === 'Yes';
+    guestPanel.hidden = !yes;
+    if (!yes) $$('input[name="guestCount"]', form).forEach(i => i.checked = false);
+  }));
+
+  // Amount shortcuts
+  $$('.amount-picks button', form).forEach(button => {
+    button.addEventListener('click', () => {
+      $$('.amount-picks button', form).forEach(b => b.classList.toggle('selected', b === button));
+      $('#pledgeAmount').value = button.dataset.amount;
+      $('#pledgeAmount').dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+  $('#pledgeAmount').addEventListener('input', () => {
+    const value = $('#pledgeAmount').value;
+    $$('.amount-picks button', form).forEach(b => b.classList.toggle('selected', b.dataset.amount === value));
+  });
+
+  // Reminder fields
+  const reminderPanel = $('#reminderPanel');
+  const reminderDate = $('#reminderDate');
+  const reminderTime = $('#reminderTime');
+  const reminderContact = $('#reminderContact');
+  const reminderLabel = $('#reminderContactLabel');
+  const reminderHint = $('#reminderContactHint');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const minDate = new Date(today); minDate.setDate(minDate.getDate() + 1);
+  const fmtInput = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  reminderDate.min = fmtInput(minDate);
+  reminderDate.max = fmtInput(weddingDate);
+
+  function setReminderState() {
+    const yes = $('input[name="reminderRequested"]:checked', form)?.value === 'Yes';
+    reminderPanel.hidden = !yes;
+    reminderDate.required = yes;
+    reminderTime.required = yes;
+    $$('input[name="reminderMethod"]', form).forEach(r => r.required = yes);
+    reminderContact.required = yes;
+    if (!yes) {
+      reminderDate.value = '';
+      reminderTime.value = '';
+      $$('input[name="reminderMethod"]', form).forEach(r => r.checked = false);
+      reminderContact.value = '';
+      reminderContact.disabled = true;
+    }
+  }
+  $$('input[name="reminderRequested"]', form).forEach(r => r.addEventListener('change', setReminderState));
+
+  function setReminderContact() {
+    const method = $('input[name="reminderMethod"]:checked', form)?.value;
+    if (!method) return;
+    reminderContact.disabled = false;
+    if (method === 'Email') {
+      reminderContact.type = 'email';
+      reminderContact.inputMode = 'email';
+      reminderLabel.textContent = 'Email address';
+      reminderContact.placeholder = 'e.g. name@example.com';
+      if (!reminderContact.value.includes('@')) reminderContact.value = '';
+      reminderHint.textContent = 'We will use this email only for your requested pledge reminder.';
+    } else {
+      reminderContact.type = 'tel';
+      reminderContact.inputMode = 'tel';
+      reminderLabel.textContent = method === 'WhatsApp' ? 'WhatsApp number' : 'Mobile number';
+      reminderContact.placeholder = 'e.g. +254 712 345 678';
+      if (!reminderContact.value || reminderContact.value.includes('@')) reminderContact.value = $('#phone').value.trim();
+      reminderHint.textContent = `We will use this number only for your requested ${method} reminder.`;
+    }
+  }
+  $$('input[name="reminderMethod"]', form).forEach(r => r.addEventListener('change', setReminderContact));
+
+  const formatKSh = value => `KSh ${Number(value || 0).toLocaleString('en-KE')}`;
+  const escapeHtml = (s) => String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+  function collectPayload() {
     const data = new FormData(form);
     return {
-      fullName: (data.get('fullName') || '').toString().trim(),
-      phone: (data.get('phone') || '').toString().trim(),
-      relationship: (data.get('relationship') || '').toString(),
-      attendance: (data.get('attendance') || '').toString(),
-      guestCount: (data.get('guestCount') || '').toString(),
-      pledgeAmount: (data.get('pledgeAmount') || '').toString(),
-      message: (data.get('message') || '').toString().trim(),
-      reminderRequested: (data.get('reminderRequested') || '').toString(),
-      reminderDate: (data.get('reminderDate') || '').toString(),
-      reminderMethod: (data.get('reminderMethod') || '').toString(),
-      reminderContact: (data.get('reminderContact') || '').toString().trim(),
-      reminderTime: (data.get('reminderTime') || '').toString(),
-      website: (data.get('website') || '').toString(),
-      submittedFrom: window.location.href,
+      fullName: String(data.get('fullName') || '').trim(),
+      phone: String(data.get('phone') || '').trim(),
+      relationship: String(data.get('relationship') || '').trim(),
+      attendance: String(data.get('attendance') || '').trim(),
+      guestCount: String(data.get('guestCount') || '').trim(),
+      pledgeAmount: String(data.get('pledgeAmount') || '').trim(),
+      message: String(data.get('message') || '').trim(),
+      reminderRequested: String(data.get('reminderRequested') || '').trim(),
+      reminderDate: String(data.get('reminderDate') || '').trim(),
+      reminderMethod: String(data.get('reminderMethod') || '').trim(),
+      reminderContact: String(data.get('reminderContact') || '').trim(),
+      reminderTime: String(data.get('reminderTime') || '').trim(),
+      website: String(data.get('website') || '').trim(),
+      submittedFrom: location.href,
       userAgent: navigator.userAgent
     };
   }
 
-  async function sendToGoogleSheet(payload) {
-    const endpoint = config.googleAppsScriptUrl;
-    if (!endpoint || endpoint.includes('PASTE_YOUR_')) throw new Error('SETUP_REQUIRED');
-    const body = new URLSearchParams(payload);
-    await fetch(endpoint, { method: 'POST', mode: 'no-cors', body });
+  function buildReview() {
+    const p = collectPayload();
+    const attendance = p.attendance === 'Yes' ? `Attending${p.guestCount ? ` · ${p.guestCount} ${p.guestCount === '1' ? 'guest' : 'guests'}` : ''}` : p.attendance;
+    let reminder = 'No reminder requested';
+    if (p.reminderRequested === 'Yes') {
+      const d = new Date(`${p.reminderDate}T12:00:00`);
+      const dateText = Number.isNaN(d.getTime()) ? p.reminderDate : d.toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+      reminder = `${p.reminderMethod} · ${dateText} · ${p.reminderTime}`;
+    }
+    $('#reviewCard').innerHTML = `
+      <div class="review-row"><span>Name</span><strong>${escapeHtml(p.fullName)}</strong></div>
+      <div class="review-row"><span>RSVP</span><strong>${escapeHtml(attendance)}</strong></div>
+      <div class="review-row"><span>Pledge</span><strong>${escapeHtml(formatKSh(p.pledgeAmount))}</strong></div>
+      <div class="review-row"><span>Reminder</span><strong>${escapeHtml(reminder)}</strong></div>
+      ${p.message ? `<div class="review-row"><span>Your message</span><strong>${escapeHtml(p.message)}</strong></div>` : ''}
+    `;
   }
 
-  function celebrate() {
-    // Modern confetti: small bars and dots rather than decorative icon glyphs.
-    for (let i = 0; i < 26; i += 1) {
-      const piece = document.createElement('span');
-      const isDot = i % 4 === 0;
-      const size = 5 + Math.random() * 7;
-      piece.style.cssText = `position:fixed;z-index:4000;left:${Math.random()*100}vw;top:104vh;width:${size}px;height:${isDot ? size : size*2.5}px;border-radius:${isDot ? '50%' : '999px'};background:${i%3 ? '#b6ff2a' : '#06172f'};pointer-events:none;opacity:.9;transition:transform 1.8s cubic-bezier(.2,.8,.2,1),opacity 1.8s ease-out;`;
-      document.body.appendChild(piece);
-      requestAnimationFrame(() => {
-        piece.style.transform = `translate(${(Math.random()-.5)*190}px,-${window.innerHeight*(.6+Math.random()*.48)}px) rotate(${Math.random()*420}deg)`;
-        piece.style.opacity = '0';
-      });
-      setTimeout(() => piece.remove(), 2000);
+  async function submitForm() {
+    if (submitting) return;
+    submitting = true;
+    wizardBack.hidden = true;
+    const holdButton = $('#holdSubmit');
+    holdButton.disabled = true;
+    $('#holdStatus').textContent = 'Sending your response...';
+    formError.hidden = true;
+    const payload = collectPayload();
+    const bodyData = new URLSearchParams(payload);
+    try {
+      if (!config.googleAppsScriptUrl) throw new Error('Google Apps Script URL is missing.');
+      await fetch(config.googleAppsScriptUrl, { method:'POST', mode:'no-cors', body: bodyData });
+      showSuccess(payload);
+    } catch (err) {
+      console.error(err);
+      showError('We could not send your response just now. Please check your connection and try again.');
+      $('#holdStatus').textContent = 'Not sealed yet';
+      holdButton.disabled = false;
+      submitting = false;
     }
   }
+
+  // Hold-to-seal interaction
+  const holdButton = $('#holdSubmit');
+  const holdFill = $('#holdFill');
+  const holdStatus = $('#holdStatus');
+  const HOLD_MS = 1350;
+
+  function cancelHold() {
+    if (submitting) return;
+    clearTimeout(holdTimer);
+    cancelAnimationFrame(holdRaf);
+    holdStart = 0;
+    holdFill.style.width = '0%';
+    holdButton.classList.remove('sealing');
+    holdStatus.textContent = 'Not sealed yet';
+  }
+  function animateHold(now) {
+    if (!holdStart) return;
+    const pct = Math.min(100, (now - holdStart) / HOLD_MS * 100);
+    holdFill.style.width = `${pct}%`;
+    holdStatus.textContent = pct > 72 ? 'Almost there...' : 'Keep holding...';
+    if (pct < 100) holdRaf = requestAnimationFrame(animateHold);
+  }
+  function beginHold(e) {
+    if (submitting) return;
+    if (e.type === 'keydown' && !['Enter',' '].includes(e.key)) return;
+    e.preventDefault();
+    holdButton.classList.add('sealing');
+    holdStart = performance.now();
+    holdRaf = requestAnimationFrame(animateHold);
+    holdTimer = setTimeout(() => {
+      holdFill.style.width = '100%';
+      holdStatus.textContent = 'Sealed with love.';
+      navigator.vibrate?.([35,30,70]);
+      submitForm();
+    }, HOLD_MS);
+  }
+  holdButton.addEventListener('pointerdown', beginHold);
+  holdButton.addEventListener('pointerup', cancelHold);
+  holdButton.addEventListener('pointerleave', cancelHold);
+  holdButton.addEventListener('pointercancel', cancelHold);
+  holdButton.addEventListener('keydown', beginHold);
+  holdButton.addEventListener('keyup', cancelHold);
 
   function showSuccess(payload) {
-    form.hidden = true;
-    const panel = $('#successPanel');
-    panel.hidden = false;
-    $('#successName').textContent = payload.fullName.split(' ')[0] || 'friend';
+    const firstName = payload.fullName.split(/\s+/)[0] || 'friend';
+    $('#successName').textContent = firstName;
     $('#successAmount').textContent = formatKSh(payload.pledgeAmount);
-    $('#tillNumber').textContent = config.tillNumber || '1610486';
-
-    const reminderSummary = $('#successReminder');
+    $('#successAttendance').textContent = payload.attendance === 'Yes' ? `Yes${payload.guestCount ? ` · ${payload.guestCount}` : ''}` : payload.attendance;
+    const msg = $('#successMessage');
+    if (payload.attendance === 'Yes') msg.textContent = 'Your RSVP and pledge are in. We cannot wait to celebrate this beautiful day with you.';
+    else if (payload.attendance === 'No') msg.textContent = 'Your response and pledge are in. Thank you for celebrating Peter and Faith from wherever you are.';
+    else msg.textContent = 'Your response and pledge are in. Thank you for being part of Peter and Faith’s journey.';
+    const rem = $('#successReminder');
     if (payload.reminderRequested === 'Yes') {
-      reminderSummary.hidden = false;
+      rem.hidden = false;
       $('#successReminderMethod').textContent = payload.reminderMethod;
-      const dateText = payload.reminderDate ? new Date(`${payload.reminderDate}T12:00:00`).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-      $('#successReminderDate').textContent = `${dateText}${payload.reminderTime ? ` · ${payload.reminderTime}` : ''}`;
-    } else reminderSummary.hidden = true;
-
-    const message = $('#successMessage');
-    const closing = $('#successClosing');
-    if (payload.attendance === 'Yes') {
-      message.textContent = 'Your RSVP and pledge have been received. Thank you for choosing to celebrate this beautiful day with us.';
-      closing.textContent = 'We can’t wait to celebrate with you on 5 December 2026.';
-    } else if (payload.attendance === 'No') {
-      message.textContent = 'Your response and pledge have been received. Thank you for celebrating Peter and Faith from wherever you are.';
-      closing.textContent = 'Your love and support are deeply appreciated.';
-    } else {
-      message.textContent = 'Your response and pledge have been received. Thank you for being part of Peter and Faith’s journey.';
-      closing.textContent = 'Whenever your plans are clear, we will be glad to hear from you.';
-    }
-    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    celebrate();
+      const d = new Date(`${payload.reminderDate}T12:00:00`);
+      const dateText = Number.isNaN(d.getTime()) ? payload.reminderDate : d.toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+      $('#successReminderDate').textContent = `${dateText} · ${payload.reminderTime}`;
+    } else rem.hidden = true;
+    const scene = $('#successScene');
+    scene.hidden = false;
+    scene.scrollIntoView({ behavior:'smooth', block:'start' });
+    setTimeout(() => launchConfetti(), 550);
+    submitting = false;
   }
 
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (!validateForm()) return;
-    const payload = buildPayload();
-    if (payload.website) return;
-    setSubmitting(true);
-    clearError();
+  $('#copyTill').addEventListener('click', async () => {
     try {
-      await sendToGoogleSheet(payload);
-      showSuccess(payload);
-    } catch (error) {
-      if (error.message === 'SETUP_REQUIRED') showError('The Google Sheet connection has not been activated yet. Please check assets/js/config.js.');
-      else { console.error(error); showError('We could not send your response right now. Please check your internet connection and try again.'); }
-    } finally { setSubmitting(false); }
+      await navigator.clipboard.writeText(String(config.tillNumber || '1610486'));
+      const btn = $('#copyTill');
+      const old = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      navigator.vibrate?.(35);
+      setTimeout(() => btn.textContent = old, 1800);
+    } catch {
+      prompt('Copy the M-Pesa Till Number:', String(config.tillNumber || '1610486'));
+    }
   });
 
-  $('#copyTill').addEventListener('click', async () => {
-    const till = config.tillNumber || '1610486';
-    const status = $('#copyStatus');
-    try { await navigator.clipboard.writeText(till); status.textContent = 'Till Number copied.'; }
-    catch { status.textContent = `Till Number: ${till}`; }
-    setTimeout(() => { status.textContent = ''; }, 2500);
+  $('#shareResponse').addEventListener('click', async () => {
+    const shareData = {
+      title: 'Peter & Faith · 5 December 2026',
+      text: 'Celebrate Peter & Faith on 5 December 2026. #PeterAndFaith2026',
+      url: location.origin + location.pathname
+    };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else await navigator.clipboard.writeText(shareData.url);
+    } catch (e) { if (e?.name !== 'AbortError') console.warn(e); }
   });
+
+  // Lightweight confetti without an external library
+  function launchConfetti() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const canvas = $('#confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const resize = () => {
+      canvas.width = innerWidth * dpr;
+      canvas.height = Math.max(innerHeight, $('#successScene').offsetHeight) * dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    };
+    resize();
+    const colors = ['#b8ff35','#ffffff','#d7ff82','#5fa3ff'];
+    const pieces = Array.from({length:90}, () => ({
+      x: innerWidth * (.15 + Math.random()*.7), y: -20-Math.random()*120,
+      vx:(Math.random()-.5)*3, vy:2.5+Math.random()*4,
+      r:2+Math.random()*4, rot:Math.random()*6.28, vr:(Math.random()-.5)*.15,
+      c:colors[Math.floor(Math.random()*colors.length)]
+    }));
+    let frames = 0;
+    function draw() {
+      ctx.clearRect(0,0,innerWidth,canvas.height/dpr);
+      pieces.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += .018;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c;
+        ctx.fillRect(-p.r,-p.r*.45,p.r*2,p.r*.9); ctx.restore();
+      });
+      frames++;
+      if (frames < 300) requestAnimationFrame(draw); else ctx.clearRect(0,0,innerWidth,canvas.height/dpr);
+    }
+    draw();
+  }
+
+  // Initialize
+  showStep(1);
+  setReminderState();
+  setMusicUI();
 })();

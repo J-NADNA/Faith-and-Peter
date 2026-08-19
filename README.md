@@ -1,91 +1,60 @@
-# Peter & Faith Wedding Website - Modern Editorial Edition
+# Peter & Faith Wedding Experience
 
-A mobile-first RSVP and pledge website for Peter Ochieng' and Faith, celebrating their wedding on 5 December 2026.
+A cinematic, interactive wedding RSVP and pledge website for Peter Ochieng' and Lorin Faith.
 
-## Design direction
+## What this version includes
 
-This version goes back to the strengths of the original site, then modernizes the visual system.
+- Cinematic entry screen with optional instrumental music
+- Motion video backgrounds and wedding imagery
+- Live countdown to 5 December 2026 at 9:00 AM
+- Interactive Peter / Faith message switcher
+- Ceremony and reception details
+- Add-to-calendar file and reception map link
+- Wedding support target: KSh 550,000
+- Five-step conversational RSVP and pledge journey
+- Conditional guest-count question
+- Quick pledge amounts plus custom amount
+- Personal message field
+- Optional reminder date, time, method and contact
+- Press-and-hold "seal" interaction before submission
+- Google Sheets submission through Google Apps Script
+- Personalized confirmation and wedding-pass screen
+- M-Pesa Till Number 1610486 with copy button
+- Share action, enquiry phone numbers and WhatsApp links
+- Responsive mobile layout, reduced-motion support and lightweight confetti
 
-- No couple photos are used.
-- No decorative icon packs or oversized wedding symbols are used.
-- The design is driven by typography, space, luminous green accents, soft motion, abstract shapes and clean editorial cards.
-- The original music experience is back as a compact floating play/pause pill.
-- The entrance screen lets a guest choose whether to enter with the instrumental or quietly.
-- The hero, countdown, story, wedding details, pledge target, RSVP form and confirmation have all been redesigned.
-- RSVP and reminder fields stay conversational and reveal only when they are relevant.
-- The form includes a four-step progress indicator.
-- The confirmation screen still shows the pledge, reminder summary and M-Pesa Till details.
-- The ceremony venue is correctly written as **Funyula Altar**.
+## Google Apps Script
 
-## Google Sheet connection
-
-The website is already configured with the working Google Apps Script endpoint:
+The live endpoint is already configured in `assets/js/config.js`:
 
 `https://script.google.com/macros/s/AKfycbz33odHr8iMBUeaJ3dqjHmJsnjA3xMrC70W_uMx9LQQPGEz9rW6paHK8x_3b1oOFSTX/exec`
 
-You do not need to paste this URL again.
+If your current Google Sheet is already receiving these fields, you do not need to change the endpoint:
 
-## Reminder fields
-
-If a guest asks to be reminded, the form collects:
-
-- Reminder date
-- Preferred time: Morning, Afternoon or Evening
-- Reminder method: WhatsApp, SMS or Email
-- The phone number or email address where the reminder should be sent
-
-If your current Apps Script already records these three new reminder columns, you do not need to change it again.
-
-If your sheet only records the older fields, update Apps Script once:
-
-1. Open the wedding Google Sheet.
-2. Go to **Extensions -> Apps Script**.
-3. Open `google-apps-script/Code.gs` from this package.
-4. Replace the existing Apps Script code and save.
-5. Choose **Deploy -> Manage deployments**.
-6. Edit the existing Web App deployment.
-7. Set Version to **New version**.
-8. Keep **Execute as: Me** and **Who has access: Anyone**.
-9. Click **Deploy**.
-
-Updating the existing deployment keeps the same `/exec` URL.
-
-## Google Sheet columns added for reminders
-
-The included receiver preserves the original response columns and adds:
-
+- Full Name
+- Phone Number
+- Relationship
+- Attendance
+- Guest Count
+- Pledge Amount
+- Reminder Requested
+- Reminder Date
+- Message
 - Reminder Method
 - Reminder Contact
 - Reminder Time
 
-Existing rows remain intact.
+If the three reminder detail columns are not yet appearing, replace the existing Apps Script code with `google-apps-script/Code.gs`, then update the existing Web App deployment to a new version. Keep "Execute as: Me" and "Who has access: Anyone".
 
-## Deploy to GitHub and Netlify
+## GitHub + Netlify
 
-Extract this ZIP and upload the extracted files to the GitHub repository. Do not upload the ZIP as the website itself.
+1. Extract the ZIP.
+2. Upload the extracted contents to the root of your GitHub repository.
+3. Do not upload the ZIP itself as the website.
+4. Commit and push the files.
+5. If Netlify is already connected to the repository, the site should redeploy automatically.
+6. If creating a new Netlify site, use the repository root as the publish directory. No build command is required.
 
-Repository root:
+## Important final test
 
-- `index.html`
-- `netlify.toml`
-- `README.md`
-- `DEPLOYMENT_CHECKLIST.md`
-- `assets/`
-- `google-apps-script/`
-
-This is a static site, so Netlify needs no build command. If Netlify is already connected to the GitHub repository, pushing the new files should trigger a new deployment automatically.
-
-## Recommended final test
-
-Submit one test response from a phone with:
-
-- RSVP = Yes
-- Guest count = 2
-- Pledge = KSh 1,000
-- Reminder = Yes
-- Reminder method = WhatsApp
-- Reminder date = any valid future date before the wedding
-- Reminder time = Morning
-- Reminder contact = your test phone number
-
-Then confirm that the Google Sheet receives the response and the reminder fields.
+Before sharing the site publicly, submit one test response on a phone and confirm that the row appears in the `Responses` tab of the Google Sheet, including any reminder fields you selected.

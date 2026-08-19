@@ -4,5 +4,7 @@ window.WEDDING_CONFIG = {
   tillNumber: "1610486",
   tillName: "Peter Ochieng",
   pledgeTarget: 550000,
-  receptionMapUrl: "https://share.google/i41BX1rXfs7mDl4dc"
+  receptionMapUrl: "https://share.google/i41BX1rXfs7mDl4dc",
+  faithPhone: "+254115010415",
+  peterPhone: "+254769925317"
 };
