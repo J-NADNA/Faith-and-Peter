@@ -1,21 +1,22 @@
 /**
- * Peter & Faith Wedding Website -> Google Sheets receiver
+ * Peter & Faith Wedding Website -> Google Sheets receiver (v2)
  *
- * SETUP:
- * 1. Open the wedding Google Sheet.
- * 2. Extensions -> Apps Script.
- * 3. Replace the editor content with this file.
- * 4. Save.
- * 5. Deploy -> New deployment -> Web app.
- * 6. Execute as: Me.
- * 7. Who has access: Anyone.
- * 8. Deploy and copy the Web App URL ending in /exec.
- * 9. Paste that URL into assets/js/config.js.
+ * IMPORTANT FOR AN EXISTING DEPLOYMENT:
+ * 1. Open the wedding Google Sheet -> Extensions -> Apps Script.
+ * 2. Replace the existing Code.gs with this file and save.
+ * 3. Deploy -> Manage deployments.
+ * 4. Edit the existing Web App deployment.
+ * 5. Set Version to "New version" and deploy.
+ * 6. Keep Execute as: Me and Who has access: Anyone.
+ *
+ * Your existing /exec URL can stay the same when you update the same deployment.
  */
 
 const SHEET_ID = '1g5kNzHEwPvesv8ZfB2w-pT7Wqi15pvs1zDcQ2zDrYfM';
 const SHEET_NAME = 'Responses';
 
+// The first 12 columns remain exactly as they were in v1 so existing rows stay aligned.
+// New reminder fields are appended at the end for backward compatibility.
 const HEADERS = [
   'Timestamp',
   'Full Name',
@@ -28,12 +29,15 @@ const HEADERS = [
   'Reminder Date',
   'Message to Couple',
   'Submitted From',
-  'User Agent'
+  'User Agent',
+  'Reminder Method',
+  'Reminder Contact',
+  'Reminder Time'
 ];
 
 function doGet() {
   return ContentService
-    .createTextOutput(JSON.stringify({ ok: true, service: 'Peter & Faith wedding form' }))
+    .createTextOutput(JSON.stringify({ ok: true, service: 'Peter & Faith wedding form v2' }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -41,10 +45,7 @@ function doPost(e) {
   try {
     const p = e && e.parameter ? e.parameter : {};
 
-    // Honeypot: real guests never fill this field.
-    if (String(p.website || '').trim()) {
-      return json_({ ok: true });
-    }
+    if (String(p.website || '').trim()) return json_({ ok: true });
 
     const fullName = clean_(p.fullName, 120);
     const phone = clean_(p.phone, 40);
@@ -57,51 +58,34 @@ function doPost(e) {
     const message = clean_(p.message, 500);
     const submittedFrom = clean_(p.submittedFrom, 300);
     const userAgent = clean_(p.userAgent, 500);
+    const reminderMethod = clean_(p.reminderMethod, 20);
+    const reminderContact = clean_(p.reminderContact, 120);
+    const reminderTime = clean_(p.reminderTime, 20);
 
     if (!fullName || !phone || !attendance || pledgeAmount <= 0 || !reminderRequested) {
       return json_({ ok: false, error: 'Missing required fields.' });
     }
-
     if (attendance === 'Yes' && !guestCount) {
       return json_({ ok: false, error: 'Guest count is required for attending guests.' });
     }
-
-    if (reminderRequested === 'Yes' && !reminderDate) {
-      return json_({ ok: false, error: 'Reminder date is required.' });
+    if (reminderRequested === 'Yes' && (!reminderDate || !reminderMethod || !reminderContact || !reminderTime)) {
+      return json_({ ok: false, error: 'Reminder date, method, contact and time are required.' });
     }
 
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
-
     try {
       const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
       let sheet = spreadsheet.getSheetByName(SHEET_NAME);
-      if (!sheet) {
-        sheet = spreadsheet.insertSheet(SHEET_NAME);
-      }
-
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(HEADERS);
-        sheet.setFrozenRows(1);
-        sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
-      }
+      if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
+      ensureHeaders_(sheet);
 
       sheet.appendRow([
-        new Date(),
-        fullName,
-        phone,
-        relationship,
-        attendance,
-        guestCount,
-        pledgeAmount,
-        reminderRequested,
-        reminderDate,
-        message,
-        submittedFrom,
-        userAgent
+        new Date(), fullName, phone, relationship, attendance, guestCount,
+        pledgeAmount, reminderRequested, reminderDate, message, submittedFrom,
+        userAgent, reminderMethod, reminderContact, reminderTime
       ]);
 
-      // Helpful number/date formatting.
       const lastRow = sheet.getLastRow();
       sheet.getRange(lastRow, 1).setNumberFormat('dd mmm yyyy, hh:mm');
       sheet.getRange(lastRow, 7).setNumberFormat('#,##0');
@@ -117,9 +101,26 @@ function doPost(e) {
   }
 }
 
+function ensureHeaders_(sheet) {
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
+    return;
+  }
+
+  // Preserve existing v1 data. Only add/refresh headers in the new columns.
+  const currentLastColumn = Math.max(sheet.getLastColumn(), 1);
+  const currentHeaders = sheet.getRange(1, 1, 1, currentLastColumn).getValues()[0];
+  for (let i = 0; i < HEADERS.length; i += 1) {
+    if (!currentHeaders[i] || i >= 12) sheet.getRange(1, i + 1).setValue(HEADERS[i]);
+  }
+  sheet.setFrozenRows(1);
+  sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
+}
+
 function clean_(value, maxLength) {
   const text = String(value == null ? '' : value).trim();
-  // Prevent values beginning with spreadsheet formula characters from executing as formulas.
   const safe = /^[=+\-@]/.test(text) ? "'" + text : text;
   return safe.slice(0, maxLength);
 }

@@ -13,15 +13,36 @@
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+  <svg class="svg-sprite" aria-hidden="true" width="0" height="0">
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 20.4 4.3 13A5.2 5.2 0 0 1 11.7 5.6L12 6l.3-.4A5.2 5.2 0 0 1 19.7 13L12 20.4Z"/></symbol>
+    <symbol id="icon-rings" viewBox="0 0 48 48"><circle cx="18" cy="26" r="11"/><circle cx="30" cy="26" r="11"/><path d="m24 8 4-5 4 5-4 5-4-5Z"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="icon-gift" viewBox="0 0 24 24"><path d="M3 10h18v11H3zM2 7h20v4H2zM12 7v14"/><path d="M12 7H8.5A2.5 2.5 0 1 1 11 4.5L12 7Zm0 0h3.5A2.5 2.5 0 1 0 13 4.5L12 7Z"/></symbol>
+    <symbol id="icon-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13M9 18a3 3 0 1 1-3-3h3v3Zm11-2a3 3 0 1 1-3-3h3v3Z"/></symbol>
+    <symbol id="icon-whatsapp" viewBox="0 0 24 24"><path d="M20 11.7a8 8 0 0 1-11.8 7L4 20l1.3-4.1A8 8 0 1 1 20 11.7Z"/><path d="M9 8.5c.5 2.8 2.1 4.4 5 5.1"/></symbol>
+    <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M7 3 4 5c.3 7.4 7.6 14.7 15 15l2-3-5-3-2 2c-2.7-1-5-3.3-6-6l2-2-3-5Z"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4V4Z"/></symbol>
+    <symbol id="icon-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24"><path d="M12 2c.8 5.4 4.6 9.2 10 10-5.4.8-9.2 4.6-10 10-.8-5.4-4.6-9.2-10-10 5.4-.8 9.2-4.6 10-10Z"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  </svg>
+
   <a class="skip-link" href="#main">Skip to main content</a>
 
   <div class="entrance" id="entrance" aria-label="Wedding welcome">
-    <div class="entrance__glow"></div>
+    <div class="entrance__orb entrance__orb--one"></div>
+    <div class="entrance__orb entrance__orb--two"></div>
     <div class="entrance__content">
-      <span class="eyebrow">5 December 2026</span>
-      <h1>Peter <span aria-hidden="true">♥</span> Faith</h1>
+      <div class="entrance__mark" aria-hidden="true"><svg><use href="#icon-rings"></use></svg></div>
+      <span class="eyebrow eyebrow--green">5 December 2026</span>
+      <h1>Peter <span>♥</span> Faith</h1>
       <p>With grateful hearts, we invite you into our celebration of love, faith and a beautiful new beginning.</p>
-      <button class="button button--primary button--large" id="enterWithMusic" type="button">Enter our celebration <span aria-hidden="true">♪</span></button>
+      <button class="button button--primary button--large" id="enterWithMusic" type="button"><svg aria-hidden="true"><use href="#icon-music"></use></svg> Enter with our song</button>
       <button class="text-button" id="enterQuietly" type="button">Enter without music</button>
     </div>
   </div>
@@ -31,15 +52,17 @@
   </audio>
 
   <button class="music-control" id="musicControl" type="button" aria-label="Play background music" title="Play background music">
-    <span class="music-control__icon" aria-hidden="true">♪</span>
+    <span class="music-control__disc" aria-hidden="true"><svg><use href="#icon-music"></use></svg></span>
     <span class="music-control__label">Play song</span>
   </button>
 
   <header class="hero" id="home">
-    <div class="hero__photos" aria-hidden="true">
-      <figure class="hero__photo hero__photo--peter"><img src="assets/images/peter-formal.webp" alt="" fetchpriority="high"></figure>
-      <figure class="hero__photo hero__photo--faith"><img src="assets/images/faith-formal.webp" alt="" fetchpriority="high"></figure>
-      <div class="hero__shade"></div>
+    <div class="hero__pattern" aria-hidden="true">
+      <span class="hero__ring hero__ring--one"></span>
+      <span class="hero__ring hero__ring--two"></span>
+      <span class="hero__spark hero__spark--one">✦</span>
+      <span class="hero__spark hero__spark--two">✦</span>
+      <span class="hero__spark hero__spark--three">✦</span>
     </div>
     <nav class="nav" aria-label="Main navigation">
       <a class="nav__brand" href="#home">P <span>♥</span> F</a>
@@ -50,13 +73,17 @@
       </div>
     </nav>
     <div class="hero__content reveal">
-      <span class="eyebrow">We are getting married</span>
+      <div class="hero__icon"><svg aria-hidden="true"><use href="#icon-rings"></use></svg></div>
+      <span class="eyebrow eyebrow--green">We are getting married</span>
       <h1>Peter <span aria-hidden="true">♥</span> Faith</h1>
-      <p class="hero__date">Saturday, 5 December 2026 · 9:00 AM</p>
+      <p class="hero__date">Saturday, 5 December 2026 <span>•</span> 9:00 AM</p>
+      <p class="hero__lead">A day of love, faith, family and the beginning of forever.</p>
       <div class="hero__actions">
-        <a class="button button--primary" href="#pledge">RSVP & make a pledge</a>
-        <a class="button button--ghost" href="#details">View wedding details</a>
+        <a class="button button--primary" href="#pledge"><svg aria-hidden="true"><use href="#icon-heart"></use></svg> RSVP & make a pledge</a>
+        <a class="button button--ghost" href="#details"><svg aria-hidden="true"><use href="#icon-calendar"></use></svg> View wedding details</a>
       </div>
+      <button class="share-button" id="shareInvitation" type="button"><svg aria-hidden="true"><use href="#icon-share"></use></svg><span>Share this invitation</span></button>
+      <p class="share-status" id="shareStatus" aria-live="polite"></p>
     </div>
     <a class="scroll-cue" href="#countdown" aria-label="Scroll to countdown"><span>Scroll</span><b aria-hidden="true">↓</b></a>
   </header>
@@ -64,6 +91,7 @@
   <main id="main">
     <section class="section section--navy countdown-section" id="countdown">
       <div class="section__inner section__inner--narrow reveal">
+        <div class="section-icon section-icon--green"><svg aria-hidden="true"><use href="#icon-clock"></use></svg></div>
         <p class="eyebrow eyebrow--green">Until we say “I do”</p>
         <div class="countdown" aria-live="polite" aria-label="Countdown to wedding">
           <div><strong id="days">0</strong><span>Days</span></div>
@@ -71,33 +99,27 @@
           <div><strong id="minutes">0</strong><span>Minutes</span></div>
           <div><strong id="seconds">0</strong><span>Seconds</span></div>
         </div>
-        <p class="countdown__date">5 December 2026 · 9:00 AM · Funyula Alter</p>
+        <p class="countdown__date">5 December 2026 <span>•</span> 9:00 AM <span>•</span> Funyula Altar</p>
       </div>
     </section>
 
     <section class="section story" id="story">
       <div class="section__inner">
         <div class="section-heading reveal">
+          <div class="section-icon"><svg aria-hidden="true"><use href="#icon-heart"></use></svg></div>
           <p class="eyebrow">A story written with grace</p>
           <h2>Two hearts, one beautiful beginning</h2>
-          <p>Some stories do not need many words. They are carried by faith, timing, gratitude and the people who walk beside us.</p>
+          <p>Some stories are carried by faith, timing, gratitude and the people who walk beside us.</p>
         </div>
 
-        <div class="story-cards">
-          <article class="story-card reveal">
-            <img src="assets/images/peter-casual.webp" alt="Peter Ochieng smiling" loading="lazy">
-            <div class="story-card__body">
-              <span>Peter</span>
-              <blockquote>“Our story is a reminder that God makes all things beautiful in His time.”</blockquote>
-            </div>
+        <div class="quote-grid">
+          <article class="quote-card quote-card--navy reveal">
+            <div class="quote-card__top"><span class="initial-badge">P</span><span>Peter</span><svg aria-hidden="true"><use href="#icon-spark"></use></svg></div>
+            <blockquote>“Our story is a reminder that God makes all things beautiful in His time.”</blockquote>
           </article>
-
-          <article class="story-card story-card--reverse reveal">
-            <img src="assets/images/faith-portrait.webp" alt="Faith standing outdoors" loading="lazy">
-            <div class="story-card__body">
-              <span>Faith</span>
-              <blockquote>“My story is a testament of God's faithfulness, a beautiful reminder that when He writes the story, every chapter unfolds with purpose, grace and love.”</blockquote>
-            </div>
+          <article class="quote-card quote-card--green reveal">
+            <div class="quote-card__top"><span class="initial-badge">F</span><span>Faith</span><svg aria-hidden="true"><use href="#icon-spark"></use></svg></div>
+            <blockquote>“My story is a testament of God's faithfulness, a beautiful reminder that when He writes the story, every chapter unfolds with purpose, grace and love.”</blockquote>
           </article>
         </div>
       </div>
@@ -105,54 +127,71 @@
 
     <section class="section invitation" id="details">
       <div class="section__inner section__inner--narrow reveal">
+        <div class="section-icon section-icon--lime"><svg aria-hidden="true"><use href="#icon-calendar"></use></svg></div>
         <p class="eyebrow">You are warmly invited</p>
         <h2>Come celebrate with us</h2>
         <p class="invitation__lead">With grateful hearts and the blessings of our parents, we warmly invite you to share in the joy of our wedding. Your presence, prayers and love will make our day even more special.</p>
 
         <div class="detail-grid">
-          <article class="detail-card">
-            <span class="detail-card__icon" aria-hidden="true">✦</span>
-            <h3>Wedding Ceremony</h3>
-            <p><strong>Funyula Alter</strong></p>
+          <article class="detail-card detail-card--ceremony">
+            <span class="detail-card__icon" aria-hidden="true"><svg><use href="#icon-rings"></use></svg></span>
+            <p class="detail-card__label">Wedding Ceremony</p>
+            <h3>Funyula Altar</h3>
             <p>Saturday, 5 December 2026</p>
-            <p>From 9:00 AM</p>
+            <p><strong>From 9:00 AM</strong></p>
           </article>
-          <article class="detail-card">
-            <span class="detail-card__icon" aria-hidden="true">⌖</span>
-            <h3>Reception</h3>
-            <p><strong>Samia Resort</strong></p>
+          <article class="detail-card detail-card--reception">
+            <span class="detail-card__icon" aria-hidden="true"><svg><use href="#icon-pin"></use></svg></span>
+            <p class="detail-card__label">Reception</p>
+            <h3>Samia Resort</h3>
             <p>Nangina, Mayatos-Funyula Rd, Busia</p>
-            <a class="button button--secondary button--small" href="https://share.google/i41BX1rXfs7mDl4dc" target="_blank" rel="noopener">Get directions</a>
+            <a class="button button--secondary button--small" href="https://share.google/i41BX1rXfs7mDl4dc" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#icon-pin"></use></svg> Get directions</a>
           </article>
+        </div>
+
+        <div class="detail-actions">
+          <a class="mini-action" href="assets/peter-faith-wedding.ics" download><svg aria-hidden="true"><use href="#icon-calendar"></use></svg><span><strong>Add to calendar</strong><small>Save 5 December</small></span></a>
+          <button class="mini-action" id="shareDetails" type="button"><svg aria-hidden="true"><use href="#icon-share"></use></svg><span><strong>Share the date</strong><small>Send to family & friends</small></span></button>
         </div>
       </div>
     </section>
 
     <section class="section pledge-intro">
       <div class="section__inner section__inner--narrow reveal">
-        <p class="eyebrow">Partner with us</p>
-        <h2>Wedding pledge target</h2>
-        <div class="target-card">
-          <span>Our wedding budget</span>
-          <strong>KSh 550,000</strong>
+        <div class="pledge-highlight">
+          <div class="section-icon section-icon--dark"><svg aria-hidden="true"><use href="#icon-gift"></use></svg></div>
+          <p class="eyebrow eyebrow--green">Partner with us</p>
+          <h2>Wedding pledge target</h2>
+          <div class="target-card">
+            <span>Our wedding budget</span>
+            <strong>KSh 550,000</strong>
+            <small>No public running total. Every gift is appreciated.</small>
+          </div>
+          <p>As we prepare for this special day, we humbly welcome you to support our wedding budget as the Lord enables you. Every contribution, given with love, will go a long way in helping us begin this new chapter together.</p>
         </div>
-        <p>As we prepare for this special day, we humbly welcome you to support our wedding budget as the Lord enables you. Every contribution, given with love, will go a long way in helping us begin this new chapter together.</p>
       </div>
     </section>
 
     <section class="section section--soft form-section" id="pledge">
       <div class="section__inner form-layout">
         <div class="form-intro reveal">
+          <div class="section-icon"><svg aria-hidden="true"><use href="#icon-user"></use></svg></div>
           <p class="eyebrow">We would love to hear from you</p>
           <h2>RSVP & make your pledge</h2>
           <p>Tell us if you will be joining us, leave a message, and make a pledge if you are able. Your response goes directly to our private wedding planning sheet.</p>
           <div class="form-promise">
-            <span aria-hidden="true">♡</span>
-            <p>Your phone number and personal response will not be shown publicly.</p>
+            <svg aria-hidden="true"><use href="#icon-heart"></use></svg>
+            <p>Your contact details and personal response will not be shown publicly.</p>
+          </div>
+          <div class="form-feature-list">
+            <span><svg aria-hidden="true"><use href="#icon-check"></use></svg> RSVP in under 2 minutes</span>
+            <span><svg aria-hidden="true"><use href="#icon-check"></use></svg> Choose your own reminder date</span>
+            <span><svg aria-hidden="true"><use href="#icon-check"></use></svg> WhatsApp, SMS or email reminders</span>
           </div>
         </div>
 
         <div class="form-card reveal">
+          <div class="form-progress" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span></div>
           <form id="pledgeForm" novalidate>
             <input class="honeypot" type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -168,12 +207,7 @@
                 <label class="field">How do you know us?
                   <select name="relationship" id="relationship">
                     <option value="">Choose one</option>
-                    <option>Family</option>
-                    <option>Friend</option>
-                    <option>Church</option>
-                    <option>Colleague</option>
-                    <option>Neighbour</option>
-                    <option>Other</option>
+                    <option>Family</option><option>Friend</option><option>Church</option><option>Colleague</option><option>Neighbour</option><option>Other</option>
                   </select>
                 </label>
               </div>
@@ -189,79 +223,95 @@
                   <label class="choice"><input type="radio" name="attendance" value="Not sure"><span><b aria-hidden="true">?</b> Not sure yet</span></label>
                 </div>
               </fieldset>
-              <div class="conditional" id="guestCountWrap" hidden>
+              <div class="conditional-panel" id="guestCountPanel" hidden>
                 <label class="field">How many people will attend, including you? <span>*</span>
                   <select name="guestCount" id="guestCount">
-                    <option value="">Select</option>
-                    <option value="1">1 person</option>
-                    <option value="2">2 people</option>
-                    <option value="3">3 people</option>
-                    <option value="4">4 people</option>
-                    <option value="5+">5 or more</option>
+                    <option value="">Choose number</option><option value="1">1 person</option><option value="2">2 people</option><option value="3">3 people</option><option value="4">4 people</option><option value="5+">5 or more</option>
                   </select>
                 </label>
               </div>
             </div>
 
             <div class="form-step">
-              <div class="form-step__head"><span>03</span><div><h3>Your pledge</h3><p>Thank you for supporting this new chapter with us.</p></div></div>
-              <label class="field field--amount">Pledge amount (KSh) <span>*</span>
-                <div class="amount-input"><span>KSh</span><input type="number" name="pledgeAmount" id="pledgeAmount" min="1" step="1" inputmode="numeric" required placeholder="5,000"></div>
+              <div class="form-step__head"><span>03</span><div><h3>Your pledge & message</h3><p>Give as the Lord enables you.</p></div></div>
+              <label class="field field--full">Pledge amount (KSh) <span>*</span>
+                <div class="amount-input"><span>KSh</span><input type="number" name="pledgeAmount" id="pledgeAmount" required min="1" step="1" inputmode="numeric" placeholder="Enter amount"></div>
               </label>
               <div class="quick-amounts" aria-label="Quick pledge amounts">
-                <button type="button" data-amount="1000">1,000</button>
-                <button type="button" data-amount="2500">2,500</button>
-                <button type="button" data-amount="5000">5,000</button>
-                <button type="button" data-amount="10000">10,000</button>
+                <button type="button" data-amount="1000">1,000</button><button type="button" data-amount="2500">2,500</button><button type="button" data-amount="5000">5,000</button><button type="button" data-amount="10000">10,000</button>
               </div>
-              <label class="field field--full">Leave a message for Peter & Faith
-                <textarea name="message" id="message" rows="4" maxlength="500" placeholder="A prayer, wish, memory or a few words from your heart..."></textarea>
+              <label class="field field--full">Leave Peter & Faith a message <span class="field__optional">Optional</span>
+                <textarea name="message" id="message" rows="4" maxlength="500" placeholder="A prayer, blessing or message from your heart..."></textarea>
               </label>
             </div>
 
-            <div class="form-step">
-              <div class="form-step__head"><span>04</span><div><h3>Would you like a reminder?</h3><p>If yes, choose the day you would like us to remember your pledge with you.</p></div></div>
+            <div class="form-step form-step--reminder">
+              <div class="form-step__head"><span>04</span><div><h3>Would you like a reminder?</h3><p>You choose when and how we should reach you.</p></div></div>
               <fieldset class="choice-fieldset">
                 <legend class="sr-only">Would you like a pledge reminder?</legend>
-                <div class="choice-grid">
-                  <label class="choice"><input type="radio" name="reminderRequested" value="Yes" required><span>Yes, please</span></label>
-                  <label class="choice"><input type="radio" name="reminderRequested" value="No"><span>No, thank you</span></label>
+                <div class="choice-grid choice-grid--two">
+                  <label class="choice"><input type="radio" name="reminderRequested" value="Yes" required><span><b aria-hidden="true">✓</b> Yes, remind me</span></label>
+                  <label class="choice"><input type="radio" name="reminderRequested" value="No"><span><b aria-hidden="true">×</b> No, thank you</span></label>
                 </div>
               </fieldset>
-              <div class="conditional" id="reminderDateWrap" hidden>
-                <label class="field">Choose your reminder date <span>*</span>
-                  <input type="date" name="reminderDate" id="reminderDate">
+
+              <div class="conditional-panel reminder-panel" id="reminderPanel" hidden>
+                <div class="reminder-panel__head">
+                  <span class="reminder-panel__icon"><svg aria-hidden="true"><use href="#icon-message"></use></svg></span>
+                  <div><strong>Set your reminder preference</strong><small>We will log this with your pledge.</small></div>
+                </div>
+                <div class="field-grid">
+                  <label class="field">Reminder date <span>*</span>
+                    <input type="date" name="reminderDate" id="reminderDate">
+                  </label>
+                  <label class="field">Best time <span>*</span>
+                    <select name="reminderTime" id="reminderTime">
+                      <option value="">Choose one</option><option>Morning</option><option>Afternoon</option><option>Evening</option>
+                    </select>
+                  </label>
+                </div>
+                <fieldset class="choice-fieldset reminder-method-fieldset">
+                  <legend>How should we remind you? <span>*</span></legend>
+                  <div class="reminder-methods">
+                    <label class="reminder-method"><input type="radio" name="reminderMethod" value="WhatsApp"><span><svg aria-hidden="true"><use href="#icon-whatsapp"></use></svg><b>WhatsApp</b></span></label>
+                    <label class="reminder-method"><input type="radio" name="reminderMethod" value="SMS"><span><svg aria-hidden="true"><use href="#icon-message"></use></svg><b>SMS</b></span></label>
+                    <label class="reminder-method"><input type="radio" name="reminderMethod" value="Email"><span><svg aria-hidden="true"><use href="#icon-mail"></use></svg><b>Email</b></span></label>
+                  </div>
+                </fieldset>
+                <label class="field field--full" id="reminderContactField">Where should we send the reminder? <span>*</span>
+                  <input type="text" name="reminderContact" id="reminderContact" placeholder="Choose a reminder method above" disabled>
+                  <small id="reminderContactHint">For WhatsApp or SMS, enter the phone number. For email, enter the email address.</small>
                 </label>
               </div>
             </div>
 
             <div class="form-error" id="formError" role="alert" hidden></div>
             <button class="button button--primary button--submit" id="submitButton" type="submit">
-              <span class="button__normal">Send my response <span aria-hidden="true">♥</span></span>
-              <span class="button__loading" hidden>Sending...</span>
+              <span class="submit-normal"><svg aria-hidden="true"><use href="#icon-heart"></use></svg> Send my response</span>
+              <span class="submit-loading" hidden>Sending your response...</span>
             </button>
-            <p class="form-note">By submitting, you agree that Peter and Faith may use these details only for wedding planning and pledge follow-up.</p>
+            <p class="form-footnote">By submitting, you allow Peter & Faith to use these details only for wedding planning and pledge follow-up.</p>
           </form>
 
-          <div class="success" id="successPanel" hidden aria-live="polite">
-            <div class="success__heart" aria-hidden="true">♥</div>
+          <div class="success-panel" id="successPanel" hidden>
+            <div class="success-panel__icon"><svg aria-hidden="true"><use href="#icon-check"></use></svg></div>
             <p class="eyebrow">Response received</p>
             <h3>Thank you, <span id="successName">friend</span>!</h3>
-            <p id="successMessage">Your response has been received. Thank you for being part of Peter and Faith's celebration.</p>
-            <div class="success__pledge">
-              <span>Your pledge</span>
-              <strong id="successAmount">KSh 0</strong>
+            <p id="successMessage">Your response and pledge have been received.</p>
+            <div class="success-grid">
+              <div class="success-pledge"><span>Your pledge</span><strong id="successAmount">KSh 0</strong></div>
+              <div class="success-reminder" id="successReminder" hidden><span>Your reminder</span><strong id="successReminderMethod">WhatsApp</strong><small id="successReminderDate"></small></div>
             </div>
             <div class="till-card">
+              <div class="till-card__icon"><svg aria-hidden="true"><use href="#icon-phone"></use></svg></div>
               <p>You may fulfil your pledge via M-Pesa using the Till Number below.</p>
               <span>M-Pesa Till Number</span>
               <strong id="tillNumber">1610486</strong>
               <small>Till Name: Peter Ochieng</small>
-              <button class="button button--secondary button--small" type="button" id="copyTill">Copy Till Number</button>
-              <span class="copy-status" id="copyStatus" aria-live="polite"></span>
+              <button class="button button--lime button--small" id="copyTill" type="button"><svg aria-hidden="true"><use href="#icon-copy"></use></svg> Copy Till Number</button>
+              <p class="copy-status" id="copyStatus" aria-live="polite"></p>
             </div>
-            <p class="success__closing" id="successClosing">We can't wait to celebrate with you on 5 December 2026.</p>
-            <a class="button button--ghost-dark" href="#home">Back to the top</a>
+            <p class="success-panel__closing" id="successClosing">Your love and support are deeply appreciated.</p>
           </div>
         </div>
       </div>
@@ -269,25 +319,20 @@
 
     <section class="section enquiries" id="enquiries">
       <div class="section__inner section__inner--narrow reveal">
-        <p class="eyebrow">Wedding enquiries</p>
-        <h2>Need to reach us?</h2>
-        <p>For wedding questions, you are welcome to contact Faith or Peter directly.</p>
+        <div class="section-icon section-icon--green"><svg aria-hidden="true"><use href="#icon-message"></use></svg></div>
+        <p class="eyebrow eyebrow--green">Need to ask us something?</p>
+        <h2>Wedding enquiries</h2>
+        <p>For directions, RSVP questions or anything about the day, you can reach Faith or Peter directly.</p>
         <div class="contact-grid">
           <article class="contact-card">
-            <span>Faith</span>
-            <strong>+254 115 010415</strong>
-            <div class="contact-card__actions">
-              <a class="button button--secondary button--small" href="tel:+254115010415">Call Faith</a>
-              <a class="button button--whatsapp button--small" href="https://wa.me/254115010415?text=Hello%20Faith%2C%20I%20have%20a%20question%20about%20the%20wedding." target="_blank" rel="noopener">WhatsApp</a>
-            </div>
+            <div class="contact-card__avatar">F</div>
+            <div><span>Faith</span><strong>+254 115 010415</strong></div>
+            <div class="contact-card__actions"><a href="tel:+254115010415" aria-label="Call Faith"><svg aria-hidden="true"><use href="#icon-phone"></use></svg> Call</a><a href="https://wa.me/254115010415" target="_blank" rel="noopener" aria-label="WhatsApp Faith"><svg aria-hidden="true"><use href="#icon-whatsapp"></use></svg> WhatsApp</a></div>
           </article>
           <article class="contact-card">
-            <span>Peter</span>
-            <strong>+254 769 925317</strong>
-            <div class="contact-card__actions">
-              <a class="button button--secondary button--small" href="tel:+254769925317">Call Peter</a>
-              <a class="button button--whatsapp button--small" href="https://wa.me/254769925317?text=Hello%20Peter%2C%20I%20have%20a%20question%20about%20the%20wedding." target="_blank" rel="noopener">WhatsApp</a>
-            </div>
+            <div class="contact-card__avatar">P</div>
+            <div><span>Peter</span><strong>+254 769 925317</strong></div>
+            <div class="contact-card__actions"><a href="tel:+254769925317" aria-label="Call Peter"><svg aria-hidden="true"><use href="#icon-phone"></use></svg> Call</a><a href="https://wa.me/254769925317" target="_blank" rel="noopener" aria-label="WhatsApp Peter"><svg aria-hidden="true"><use href="#icon-whatsapp"></use></svg> WhatsApp</a></div>
           </article>
         </div>
       </div>
@@ -295,15 +340,14 @@
   </main>
 
   <footer class="footer">
-    <div class="footer__inner">
-      <p class="footer__names">Peter <span>♥</span> Faith</p>
-      <p>5 December 2026 · Funyula Alter · Samia Resort</p>
-      <p class="footer__hashtag">#PeterAndFaith2026</p>
-      <p class="footer__small">Made with love for a day worth remembering.</p>
-    </div>
+    <div class="footer__rings"><svg aria-hidden="true"><use href="#icon-rings"></use></svg></div>
+    <p>With love, faith and grateful hearts</p>
+    <strong>Peter <span>♥</span> Faith</strong>
+    <span>5 December 2026</span>
+    <a href="#home">#PeterAndFaith2026</a>
   </footer>
 
   <script src="assets/js/config.js"></script>
-  <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>

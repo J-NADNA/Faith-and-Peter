@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Peter and Faith Wedding//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:peter-faith-wedding-20261205@example.com
+DTSTAMP:20260819T150000Z
+DTSTART;TZID=Africa/Nairobi:20261205T090000
+SUMMARY:Peter & Faith Wedding
+LOCATION:Funyula Altar; Reception: Samia Resort, Nangina, Mayatos-Funyula Rd, Busia
+DESCRIPTION:Celebrate the wedding of Peter Ochieng' and Faith. Reception at Samia Resort. #PeterAndFaith2026
+END:VEVENT
+END:VCALENDAR
