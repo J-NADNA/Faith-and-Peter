@@ -1,7 +1,7 @@
 window.WEDDING_CONFIG = {
   // IMPORTANT: Replace this with the Google Apps Script Web App URL that ends in /exec.
   // Follow README.md -> "Connect the form to Google Sheets".
-  googleAppsScriptUrl: "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE",
+  googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbw9nsQX_8mwQksQRLPI6-8C6I2EXAP3WzhbdFZoap5yN_9dvFVR2fpTgDDBafCerHIs/exec",
 
   weddingDate: "2026-12-05T09:00:00+03:00",
   tillNumber: "1610486",
