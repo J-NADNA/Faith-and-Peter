@@ -1,9 +1,19 @@
-# Peter & Faith Website - Update Checklist
+# Peter & Faith Website - Final Update Checklist
 
-## 1. Update Google Apps Script
+## Website update
+
+- [ ] Extract the ZIP.
+- [ ] Replace the current GitHub repository files with this version.
+- [ ] Commit and push the changes.
+- [ ] Confirm Netlify finishes the new deployment.
+
+## Google Apps Script
+
+Only do this section if Reminder Method, Reminder Contact and Reminder Time are not already being recorded in the Google Sheet.
+
 - [ ] Open the wedding Google Sheet.
-- [ ] Extensions -> Apps Script.
-- [ ] Replace the existing code with `google-apps-script/Code.gs`.
+- [ ] Go to Extensions -> Apps Script.
+- [ ] Replace the current code with `google-apps-script/Code.gs`.
 - [ ] Save.
 - [ ] Deploy -> Manage deployments.
 - [ ] Edit the existing Web App deployment.
@@ -12,26 +22,26 @@
 - [ ] Who has access -> Anyone.
 - [ ] Deploy.
 
-## 2. Upload the website update
-- [ ] Extract this ZIP.
-- [ ] Replace the old repository files with the files in this package.
-- [ ] Commit and push to GitHub.
-- [ ] Let Netlify redeploy from GitHub, or upload the extracted folder manually in Netlify.
+## Visual and interaction test
 
-## 3. Test on phone and desktop
-- [ ] Entrance screen opens.
-- [ ] Music plays after tapping “Enter with our song”.
-- [ ] Venue reads **Funyula Altar**.
-- [ ] Countdown is working.
-- [ ] Reception directions open correctly.
+- [ ] Entrance screen looks clean on phone and desktop.
+- [ ] “Enter with our song” starts the instrumental.
+- [ ] Floating music control can pause and resume the song.
+- [ ] No couple photos appear anywhere.
+- [ ] No old icon-heavy design elements remain.
+- [ ] Venue reads **Funyula Altar** everywhere.
+- [ ] Countdown updates every second.
+- [ ] Reception directions open Samia Resort.
 - [ ] Add to Calendar downloads the wedding event.
-- [ ] Share Invitation works or copies the page link.
-- [ ] RSVP Yes reveals guest count.
-- [ ] Reminder Yes reveals date, time, method and contact fields.
-- [ ] WhatsApp/SMS reminder accepts a Kenyan phone number.
-- [ ] Email reminder accepts an email address.
+- [ ] Share Invitation works or copies the page URL.
+- [ ] RSVP Yes reveals the guest-count field.
+- [ ] Reminder Yes reveals date, time, reminder method and contact details.
+- [ ] WhatsApp and SMS accept a Kenyan phone number.
+- [ ] Email accepts an email address.
+- [ ] Form progress changes as fields are completed.
 - [ ] Submission reaches the Google Sheet.
-- [ ] New Sheet columns record Reminder Method, Reminder Contact and Reminder Time.
-- [ ] Thank-you screen shows M-Pesa Till 1610486.
+- [ ] Thank-you screen displays the guest’s first name and pledge amount.
+- [ ] M-Pesa Till Number is 1610486.
 - [ ] Copy Till Number works.
-- [ ] Faith and Peter WhatsApp buttons work.
+- [ ] Faith and Peter Call and WhatsApp links work.
+- [ ] `#PeterAndFaith2026` appears in the footer.

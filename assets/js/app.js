@@ -150,6 +150,40 @@
     if ((method === 'WhatsApp' || method === 'SMS') && !reminderContact.value) reminderContact.value = $('#phone').value.trim();
   });
 
+
+  // A light, useful progress indicator keeps the form feeling conversational.
+  const progressText = $('#progressText');
+  const progressBars = $$('.form-progress__bar span');
+  function updateFormProgress() {
+    const attendance = $('input[name="attendance"]:checked', form)?.value;
+    const reminder = $('input[name="reminderRequested"]:checked', form)?.value;
+    const reminderMethod = $('input[name="reminderMethod"]:checked', form)?.value;
+    const steps = [
+      Boolean($('#fullName').value.trim() && $('#phone').value.trim()),
+      Boolean(attendance && (attendance !== 'Yes' || guestCount.value)),
+      Number($('#pledgeAmount').value) > 0,
+      Boolean(reminder && (reminder !== 'Yes' || (reminderDate.value && reminderTime.value && reminderMethod && reminderContact.value.trim())))
+    ];
+    const completed = steps.filter(Boolean).length;
+    progressText.textContent = `${completed} of 4 complete`;
+    progressBars.forEach((bar, index) => bar.classList.toggle('is-complete', steps[index]));
+  }
+  form.addEventListener('input', updateFormProgress);
+  form.addEventListener('change', updateFormProgress);
+  updateFormProgress();
+
+  // Subtle depth on desktop. No effect on touch devices.
+  const hero = $('.hero');
+  const aurora = $('.hero__aurora');
+  if (hero && aurora && window.matchMedia('(pointer:fine)').matches) {
+    hero.addEventListener('pointermove', (event) => {
+      const x = (event.clientX / window.innerWidth - .5) * 12;
+      const y = (event.clientY / window.innerHeight - .5) * 12;
+      aurora.style.translate = `${x}px ${y}px`; 
+    });
+    hero.addEventListener('pointerleave', () => { aurora.style.translate = ''; });
+  }
+
   $$('.quick-amounts button').forEach((button) => {
     button.addEventListener('click', () => {
       $('#pledgeAmount').value = button.dataset.amount;
@@ -259,14 +293,15 @@
   }
 
   function celebrate() {
-    const symbols = ['♥', '✦', '♡', '✧'];
-    for (let i = 0; i < 22; i += 1) {
+    // Modern confetti: small bars and dots rather than decorative icon glyphs.
+    for (let i = 0; i < 26; i += 1) {
       const piece = document.createElement('span');
-      piece.textContent = symbols[i % symbols.length];
-      piece.style.cssText = `position:fixed;z-index:4000;left:${Math.random()*100}vw;top:105vh;color:${i%2 ? '#a8ff2f' : '#07172f'};font-size:${16+Math.random()*22}px;pointer-events:none;transition:transform 1.8s cubic-bezier(.2,.8,.2,1),opacity 1.8s ease-out;text-shadow:0 0 12px rgba(168,255,47,.2);`;
+      const isDot = i % 4 === 0;
+      const size = 5 + Math.random() * 7;
+      piece.style.cssText = `position:fixed;z-index:4000;left:${Math.random()*100}vw;top:104vh;width:${size}px;height:${isDot ? size : size*2.5}px;border-radius:${isDot ? '50%' : '999px'};background:${i%3 ? '#b6ff2a' : '#06172f'};pointer-events:none;opacity:.9;transition:transform 1.8s cubic-bezier(.2,.8,.2,1),opacity 1.8s ease-out;`;
       document.body.appendChild(piece);
       requestAnimationFrame(() => {
-        piece.style.transform = `translate(${(Math.random()-.5)*180}px,-${window.innerHeight*(.6+Math.random()*.45)}px) rotate(${Math.random()*260}deg)`;
+        piece.style.transform = `translate(${(Math.random()-.5)*190}px,-${window.innerHeight*(.6+Math.random()*.48)}px) rotate(${Math.random()*420}deg)`;
         piece.style.opacity = '0';
       });
       setTimeout(() => piece.remove(), 2000);

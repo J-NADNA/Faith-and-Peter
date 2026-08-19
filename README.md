@@ -1,49 +1,70 @@
-# Peter & Faith Wedding Website - Vibrant Icon Edition
+# Peter & Faith Wedding Website - Modern Editorial Edition
 
-A mobile-friendly wedding RSVP and pledge website for Peter Ochieng' & Faith, 5 December 2026.
+A mobile-first RSVP and pledge website for Peter Ochieng' and Faith, celebrating their wedding on 5 December 2026.
 
-## What changed in this version
+## Design direction
 
-- Removed all couple photos from the website.
-- Replaced photo-led sections with custom icon-led cards, linked-ring motifs, bright gradients and luminous green accents.
-- Corrected the ceremony venue everywhere to **Funyula Altar**.
-- Added the working Google Apps Script endpoint to `assets/js/config.js`.
-- Expanded pledge reminders so guests can choose **WhatsApp, SMS or Email**.
-- Guests who request a reminder also choose a reminder date, preferred time of day and the phone/email address where it should be sent.
-- Added Share Invitation, Add to Calendar, Copy Till Number and richer success-screen interactions.
-- Background instrumental remains available and starts only after a guest chooses to enter with music.
+This version goes back to the strengths of the original site, then modernizes the visual system.
 
-## Important: update Google Apps Script before using the new reminder fields
+- No couple photos are used.
+- No decorative icon packs or oversized wedding symbols are used.
+- The design is driven by typography, space, luminous green accents, soft motion, abstract shapes and clean editorial cards.
+- The original music experience is back as a compact floating play/pause pill.
+- The entrance screen lets a guest choose whether to enter with the instrumental or quietly.
+- The hero, countdown, story, wedding details, pledge target, RSVP form and confirmation have all been redesigned.
+- RSVP and reminder fields stay conversational and reveal only when they are relevant.
+- The form includes a four-step progress indicator.
+- The confirmation screen still shows the pledge, reminder summary and M-Pesa Till details.
+- The ceremony venue is correctly written as **Funyula Altar**.
 
-Your website is already connected to Google Sheets. However, the new reminder fields need the updated Apps Script receiver.
+## Google Sheet connection
 
-1. Open the wedding Google Sheet.
-2. Go to **Extensions -> Apps Script**.
-3. Open `google-apps-script/Code.gs` from this project.
-4. Replace the existing Apps Script code with the new code and save.
-5. In Apps Script, choose **Deploy -> Manage deployments**.
-6. Click the edit/pencil icon on your existing Web App deployment.
-7. Under Version, choose **New version**.
-8. Confirm **Execute as: Me** and **Who has access: Anyone**.
-9. Click **Deploy**.
-
-If you update the existing deployment, the `/exec` URL normally stays the same. The website already contains:
+The website is already configured with the working Google Apps Script endpoint:
 
 `https://script.google.com/macros/s/AKfycbz33odHr8iMBUeaJ3dqjHmJsnjA3xMrC70W_uMx9LQQPGEz9rW6paHK8x_3b1oOFSTX/exec`
 
-## New Google Sheet columns
+You do not need to paste this URL again.
 
-The script keeps the original 12 columns unchanged and adds these at the end:
+## Reminder fields
+
+If a guest asks to be reminded, the form collects:
+
+- Reminder date
+- Preferred time: Morning, Afternoon or Evening
+- Reminder method: WhatsApp, SMS or Email
+- The phone number or email address where the reminder should be sent
+
+If your current Apps Script already records these three new reminder columns, you do not need to change it again.
+
+If your sheet only records the older fields, update Apps Script once:
+
+1. Open the wedding Google Sheet.
+2. Go to **Extensions -> Apps Script**.
+3. Open `google-apps-script/Code.gs` from this package.
+4. Replace the existing Apps Script code and save.
+5. Choose **Deploy -> Manage deployments**.
+6. Edit the existing Web App deployment.
+7. Set Version to **New version**.
+8. Keep **Execute as: Me** and **Who has access: Anyone**.
+9. Click **Deploy**.
+
+Updating the existing deployment keeps the same `/exec` URL.
+
+## Google Sheet columns added for reminders
+
+The included receiver preserves the original response columns and adds:
 
 - Reminder Method
 - Reminder Contact
 - Reminder Time
 
-This means existing responses remain aligned and readable.
+Existing rows remain intact.
 
-## GitHub + Netlify deployment
+## Deploy to GitHub and Netlify
 
-Upload the extracted project files to your GitHub repository, not the ZIP itself. The repository root should contain:
+Extract this ZIP and upload the extracted files to the GitHub repository. Do not upload the ZIP as the website itself.
+
+Repository root:
 
 - `index.html`
 - `netlify.toml`
@@ -52,17 +73,19 @@ Upload the extracted project files to your GitHub repository, not the ZIP itself
 - `assets/`
 - `google-apps-script/`
 
-Netlify requires no build command because this is a static HTML/CSS/JavaScript site.
+This is a static site, so Netlify needs no build command. If Netlify is already connected to the GitHub repository, pushing the new files should trigger a new deployment automatically.
 
-## Final test
+## Recommended final test
 
-After deploying the new Apps Script version and website version, submit one test response with:
+Submit one test response from a phone with:
 
 - RSVP = Yes
+- Guest count = 2
+- Pledge = KSh 1,000
 - Reminder = Yes
-- Reminder Method = WhatsApp
-- Reminder Date = a future date
-- Reminder Contact = your test number
-- Reminder Time = Morning
+- Reminder method = WhatsApp
+- Reminder date = any valid future date before the wedding
+- Reminder time = Morning
+- Reminder contact = your test phone number
 
-Then confirm that the Google Sheet row contains values in the new reminder columns.
+Then confirm that the Google Sheet receives the response and the reminder fields.
